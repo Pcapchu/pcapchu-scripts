@@ -20,12 +20,12 @@ from pcapchu_scripts.service import PcapchuScripts
 
 
 def _configure_logging(verbose: bool) -> None:  # noqa: FBT001
-    level = logging.DEBUG if verbose else logging.INFO
+    level = logging.DEBUG if verbose else logging.ERROR
     logging.basicConfig(
         level=level,
         format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
         datefmt="%Y-%m-%dT%H:%M:%S",
-        stream=sys.stderr,
+        stream=sys.stdout,
     )
 
 
@@ -66,7 +66,10 @@ def _cmd_query(args: argparse.Namespace) -> int:
 
 def _cmd_meta(args: argparse.Namespace) -> int:
     with PcapchuScripts(work_dir=args.work_dir, db_path=args.db) as p:
-        print(p.get_meta_json())
+        if args.json:
+            print(p.get_meta_json())
+        else:
+            print(p.get_meta_toon())
     return 0
 
 
@@ -181,7 +184,8 @@ def main() -> None:
     p_query.set_defaults(func=_cmd_query)
 
     # -- meta ------------------------------------------------------------------
-    p_meta = sub.add_parser("meta", help="Print the metadata catalogue as JSON.")
+    p_meta = sub.add_parser("meta", help="Print the metadata catalogue (TOON format).")
+    p_meta.add_argument("--json", action="store_true", help="Output as JSON instead of TOON.")
     p_meta.set_defaults(func=_cmd_meta)
 
     # -- serve -----------------------------------------------------------------

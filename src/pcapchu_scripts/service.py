@@ -21,6 +21,7 @@ from pcapchu_scripts.pkt2flow import (
     run_pkt2flow,
 )
 from pcapchu_scripts.query import query as run_query
+from pcapchu_scripts.toon import meta_to_toon
 from pcapchu_scripts.types import IngestReport, QueryResult, TableMeta
 from pcapchu_scripts.zeek import run_zeek
 
@@ -132,6 +133,10 @@ class PcapchuScripts:
         return json.dumps(
             [dataclasses.asdict(m) for m in metas], default=_json_default, ensure_ascii=False
         )
+
+    def get_meta_toon(self) -> str:
+        """Return metadata as a TOON string (token-efficient for LLM agents)."""
+        return meta_to_toon(self.get_meta())
 
     def close(self) -> None:
         """Close the database connection."""
